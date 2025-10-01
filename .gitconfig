@@ -1,0 +1,53 @@
+[user]
+	# Configure these in your VS Code settings or override locally
+	# name = Your Name
+	# email = your.email@example.com
+
+[core]
+	editor = code --wait
+	autocrlf = input
+	fileMode = false
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	branches = branch -a
+	tags = tag -l
+	remotes = remote -v
+
+[color]
+	ui = auto
+	branch = auto
+	diff = auto
+	status = auto
+
+[diff]
+	tool = vscode
+
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[merge]
+	tool = vscode
+	conflictstyle = diff3
+
+[mergetool "vscode"]
+	cmd = code --wait $MERGED
