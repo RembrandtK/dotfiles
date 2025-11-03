@@ -1,0 +1,59 @@
+[user]
+	name = Rembrandt Kuipers
+	email = 50174308+RembrandtK@users.noreply.github.com
+
+[core]
+	editor = code --wait
+	autocrlf = false
+	eol = lf
+	fileMode = false
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = false
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	last = log -1 HEAD
+	unstage = reset HEAD --
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	branches = branch -a
+	tags = tag -l
+	remotes = remote -v
+	sigs = "!f() { base=$(git rev-parse --abbrev-ref --symbolic-full-name @{upstream} 2>/dev/null || echo \"origin/main\"); git log --oneline $base..HEAD --pretty=\"format:%C(yellow)%h%C(reset) %C(red)%G?%C(reset) %C(blue)%s%C(reset)\"; }; f"
+	sign-commits = "!f() { base=$(git rev-parse --abbrev-ref --symbolic-full-name @{upstream} 2>/dev/null || echo \"origin/main\"); git rebase --exec \"if ! git verify-commit HEAD 2>/dev/null; then git -c gpg.format=ssh -c user.signingkey=\\\"\\$(ssh-add -L)\\\" commit --amend -S --no-edit --no-verify; fi\" $base; }; f"
+
+[color]
+	ui = auto
+	branch = auto
+	diff = auto
+	status = auto
+
+[diff]
+	tool = vscode
+
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[merge]
+	tool = vscode
+	conflictstyle = diff3
+
+[mergetool "vscode"]
+	cmd = code --wait $MERGED
+[gpg "ssh"]
+	allowedSignersFile = /home/rem/.ssh/allowed_signers
+[rerere]
+	enabled = true
