@@ -8,33 +8,37 @@ echo "🐟 Setting up dotfiles..."
 # Get the directory where this script is located (dotfiles directory)
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Backup and install shell configs
-echo "📝 Installing shell configurations..."
+# Create symlinks for shell configs
+echo "🔗 Creating symlinks for shell configurations..."
 
-# Install bash config (force overwrite)
-if [ -f "$DOTFILES_DIR/.bashrc" ]; then
-    cp "$DOTFILES_DIR/.bashrc" "$HOME/.bashrc"
-    echo "✅ Installed .bashrc"
-fi
+# Function to safely create symlink
+create_symlink() {
+    local source="$1"
+    local target="$2"
+    local name="$3"
 
-# Install zsh config (force overwrite)
-if [ -f "$DOTFILES_DIR/.zshrc" ]; then
-    cp "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
-    echo "✅ Installed .zshrc"
-fi
+    if [ -f "$source" ]; then
+        # Remove existing file/symlink
+        [ -e "$target" ] && rm "$target"
+        ln -sf "$source" "$target"
+        echo "✅ Symlinked $name"
+    fi
+}
 
-# Install bash aliases
-if [ -f "$DOTFILES_DIR/.bash_aliases" ]; then
-    cp "$DOTFILES_DIR/.bash_aliases" "$HOME/.bash_aliases"
-    echo "✅ Installed .bash_aliases"
-fi
+# Create symlinks for shell configs
+create_symlink "$DOTFILES_DIR/.bashrc" "$HOME/.bashrc" ".bashrc"
+create_symlink "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc" ".zshrc"
+create_symlink "$DOTFILES_DIR/.bash_aliases" "$HOME/.bash_aliases" ".bash_aliases"
 
-# Install fish configuration
+# Symlink fish configuration
 echo "🐟 Setting up fish shell..."
 if [ -d "$DOTFILES_DIR/config/fish" ]; then
-    mkdir -p "$HOME/.config/fish"
-    cp -r "$DOTFILES_DIR/config/fish/"* "$HOME/.config/fish/"
-    echo "✅ Installed fish configuration"
+    # Remove existing fish config directory
+    [ -d "$HOME/.config/fish" ] && rm -rf "$HOME/.config/fish"
+    # Create parent directory and symlink the entire fish config
+    mkdir -p "$HOME/.config"
+    ln -sf "$DOTFILES_DIR/config/fish" "$HOME/.config/fish"
+    echo "✅ Symlinked fish configuration"
 fi
 
 # Git config should already be handled by VS Code dotfiles
@@ -55,6 +59,9 @@ if ! command -v fish &> /dev/null; then
 fi
 
 echo "🎉 Dotfiles installation complete!"
+echo ""
+echo "🔗 All configurations are now symlinked to ~/dotfiles/"
+echo "   Changes to dotfiles repo will be immediately reflected"
 echo ""
 echo "💡 To use fish shell:"
 echo "   fish"
