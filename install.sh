@@ -58,6 +58,30 @@ if ! command -v fish &> /dev/null; then
     fi
 fi
 
+# Set fish as default shell
+if command -v fish &> /dev/null; then
+    FISH_PATH="$(which fish)"
+
+    # Check if fish is the current default shell
+    if [ "$SHELL" != "$FISH_PATH" ]; then
+        echo "🐟 Setting fish as default shell..."
+
+        # Add fish to /etc/shells if not present
+        if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
+            echo "$FISH_PATH" | sudo tee -a /etc/shells > /dev/null
+        fi
+
+        # Change default shell (works in containers)
+        sudo usermod -s "$FISH_PATH" "$USER" 2>/dev/null || \
+            sudo chsh -s "$FISH_PATH" "$USER" 2>/dev/null || \
+            echo "⚠️  Could not change default shell automatically. Run: chsh -s \$(which fish)"
+
+        echo "✅ Fish set as default shell (restart terminal to apply)"
+    else
+        echo "✅ Fish is already the default shell"
+    fi
+fi
+
 # Link shared devcontainer files if in a dev container
 if [ "$REMOTE_CONTAINERS" = "true" ] || [ -f "/.dockerenv" ]; then
     SHARED_FILES_DIR="/git/RembrandtK/devcontainers/work"
