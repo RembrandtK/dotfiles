@@ -3,6 +3,9 @@
 # Disable fish greeting
 set -g fish_greeting
 
+# Add custom bin directory to PATH
+fish_add_path -p /git/RembrandtK/rem/bin
+
 if status is-interactive
     # Source private configs if available
     set -l private_config /git/RembrandtK/rem/config/shell/private-fish-config.fish
