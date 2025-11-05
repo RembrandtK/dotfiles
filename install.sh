@@ -8,6 +8,33 @@ echo "🐟 Setting up dotfiles..."
 # Get the directory where this script is located (dotfiles directory)
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# In dev containers, prefer /git/RembrandtK/dotfiles if it exists
+# This avoids unnecessary clones and ensures using the mounted version
+if [ -d "/git/RembrandtK/dotfiles" ] && [ "$DOTFILES_DIR" != "/git/RembrandtK/dotfiles" ]; then
+    echo "🔗 Using mounted dotfiles at /git/RembrandtK/dotfiles"
+    DOTFILES_DIR="/git/RembrandtK/dotfiles"
+
+    # Create symlink at ~/dotfiles for convenience
+    if [ ! -L "$HOME/dotfiles" ] || [ "$(readlink -f "$HOME/dotfiles")" != "/git/RembrandtK/dotfiles" ]; then
+        rm -rf "$HOME/dotfiles" 2>/dev/null || true
+        ln -sf "/git/RembrandtK/dotfiles" "$HOME/dotfiles"
+        echo "✅ Created ~/dotfiles symlink"
+    fi
+fi
+
+# Auto-update dotfiles if it's a git repo
+if [ -d "$DOTFILES_DIR/.git" ]; then
+    cd "$DOTFILES_DIR"
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        echo "⚠️  Warning: Uncommitted changes in dotfiles repo"
+        git status --short
+    else
+        echo "🔄 Checking for dotfiles updates..."
+        git pull --quiet 2>/dev/null && echo "✅ Dotfiles up to date" || true
+    fi
+    cd - > /dev/null
+fi
+
 # Create symlinks for shell configs
 echo "🔗 Creating symlinks for shell configurations..."
 
@@ -58,27 +85,18 @@ if ! command -v fish &> /dev/null; then
     fi
 fi
 
-# Set fish as default shell
+# Set fish as default shell (skip in dev containers where Dockerfile handles it)
 if command -v fish &> /dev/null; then
-    FISH_PATH="$(which fish)"
-
-    # Check if fish is the current default shell
-    if [ "$SHELL" != "$FISH_PATH" ]; then
-        echo "🐟 Setting fish as default shell..."
-
-        # Add fish to /etc/shells if not present
-        if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
-            echo "$FISH_PATH" | sudo tee -a /etc/shells > /dev/null
+    if [ "$REMOTE_CONTAINERS" != "true" ] && [ ! -f "/.dockerenv" ]; then
+        FISH_PATH="$(which fish)"
+        if [ "$SHELL" != "$FISH_PATH" ]; then
+            echo "🐟 Setting fish as default shell..."
+            if chsh -s "$FISH_PATH" 2>/dev/null; then
+                echo "✅ Fish set as default shell (restart terminal to apply)"
+            else
+                echo "⚠️  Could not change default shell. Run: chsh -s \$(which fish)"
+            fi
         fi
-
-        # Change default shell (works in containers)
-        sudo usermod -s "$FISH_PATH" "$USER" 2>/dev/null || \
-            sudo chsh -s "$FISH_PATH" "$USER" 2>/dev/null || \
-            echo "⚠️  Could not change default shell automatically. Run: chsh -s \$(which fish)"
-
-        echo "✅ Fish set as default shell (restart terminal to apply)"
-    else
-        echo "✅ Fish is already the default shell"
     fi
 fi
 
