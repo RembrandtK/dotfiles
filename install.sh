@@ -58,6 +58,37 @@ if ! command -v fish &> /dev/null; then
     fi
 fi
 
+# Link shared devcontainer files if in a dev container
+if [ "$REMOTE_CONTAINERS" = "true" ] || [ -f "/.dockerenv" ]; then
+    SHARED_FILES_DIR="/git/RembrandtK/devcontainers/work"
+    TARGET_DIR="/work"
+
+    if [ -d "$SHARED_FILES_DIR" ] && [ -d "$TARGET_DIR" ]; then
+        echo "🔗 Linking shared devcontainer files..."
+        sudo mkdir -p "$TARGET_DIR" 2>/dev/null || true
+        sudo chown vscode:vscode "$TARGET_DIR" 2>/dev/null || true
+
+        for file in "$SHARED_FILES_DIR"/*; do
+            [ ! -f "$file" ] && continue
+
+            filename=$(basename "$file")
+            target="$TARGET_DIR/$filename"
+
+            # Skip if already correctly linked
+            [ -L "$target" ] && [ "$(readlink -f "$target")" = "$(readlink -f "$file")" ] && continue
+
+            # Skip if user file exists
+            [ -e "$target" ] && [ ! -L "$target" ] && continue
+
+            # Remove stale symlink and create new one
+            [ -L "$target" ] && rm "$target"
+            ln -s "$file" "$target"
+        done
+
+        echo "✅ Linked shared files from $SHARED_FILES_DIR"
+    fi
+fi
+
 echo "🎉 Dotfiles installation complete!"
 echo ""
 echo "🔗 All configurations are now symlinked to ~/dotfiles/"
