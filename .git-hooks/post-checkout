@@ -1,0 +1,18 @@
+#!/bin/bash
+# post-checkout hook: auto-setup devcontainer symlinks
+# This hook runs after:
+# - git clone (initial checkout)
+# - git worktree add (new worktree)
+# - git checkout/switch (branch changes)
+#
+# Parameters: $1 = prev HEAD, $2 = new HEAD, $3 = branch flag (1=branch, 0=file)
+
+# Only run for branch checkouts (not file checkouts)
+if [ "$3" = "1" ]; then
+    REPO_PATH=$(git rev-parse --show-toplevel 2>/dev/null)
+
+    if [ -n "$REPO_PATH" ] && [ -x /git/RembrandtK/devcontainers/setup-devcontainer-folder.py ]; then
+        # Run setup with --quiet flag (only shows output if actions are taken)
+        /git/RembrandtK/devcontainers/setup-devcontainer-folder.py "$REPO_PATH" --quiet 2>/dev/null || true
+    fi
+fi
