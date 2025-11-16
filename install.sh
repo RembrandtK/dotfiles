@@ -131,11 +131,6 @@ if [ "$REMOTE_CONTAINERS" = "true" ] || [ -f "/.dockerenv" ]; then
     fi
 fi
 
-# Setup git hooks for automatic devcontainer symlinks
-echo "🔧 Setting up git hooks for devcontainer automation..."
-git config --global core.hooksPath /git/RembrandtK/dotfiles/.git-hooks
-echo "✅ Git hooks configured"
-
 echo "🎉 Dotfiles installation complete!"
 echo ""
 echo "🔗 All configurations are now symlinked to ~/dotfiles/"
