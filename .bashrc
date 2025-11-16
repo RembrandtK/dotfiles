@@ -45,3 +45,9 @@ fi
 if [ -f "/git/RembrandtK/rem/config/shell/private-bash-config.sh" ]; then
     source "/git/RembrandtK/rem/config/shell/private-bash-config.sh"
 fi
+. "$HOME/.cargo/env"
+
+# Add CONTAINER_BIN_PATH to PATH if set
+if [ -n "${CONTAINER_BIN_PATH:-}" ]; then
+  export PATH="$CONTAINER_BIN_PATH:$PATH"
+fi

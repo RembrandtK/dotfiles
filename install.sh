@@ -68,6 +68,14 @@ if [ -d "$DOTFILES_DIR/config/fish" ]; then
     echo "✅ Symlinked fish configuration"
 fi
 
+# Symlink git configuration (for hooks)
+if [ -d "$DOTFILES_DIR/config/git" ]; then
+    [ -d "$HOME/.config/git" ] && rm -rf "$HOME/.config/git"
+    mkdir -p "$HOME/.config"
+    ln -sf "$DOTFILES_DIR/config/git" "$HOME/.config/git"
+    echo "✅ Symlinked git hooks"
+fi
+
 # Git config should already be handled by VS Code dotfiles
 if [ -f "$HOME/.gitconfig" ]; then
     echo "✅ Git configuration already present"
