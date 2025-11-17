@@ -6,6 +6,11 @@ set -g fish_greeting
 # Add custom bin directory to PATH
 fish_add_path -p /git/RembrandtK/rem/bin
 
+# Add Foundry to PATH if it exists
+if test -d $HOME/.foundry/bin
+    fish_add_path -p $HOME/.foundry/bin
+end
+
 if status is-interactive
     # Source private configs if available
     set -l private_config /git/RembrandtK/rem/config/shell/private-fish-config.fish
