@@ -131,8 +131,8 @@ if [ "$REMOTE_CONTAINERS" = "true" ] || [ -f "/.dockerenv" ]; then
             [ -e "$target" ] && [ ! -L "$target" ] && continue
 
             # Remove stale symlink and create new one
-            [ -L "$target" ] && rm "$target"
-            ln -s "$file" "$target"
+            [ -L "$target" ] && sudo rm "$target"
+            sudo ln -s "$file" "$target"
         done
 
         echo "✅ Linked shared files from $SHARED_FILES_DIR"
