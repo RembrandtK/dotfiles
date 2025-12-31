@@ -55,3 +55,9 @@ fi
 if [ -n "${CONTAINER_BIN_PATH:-}" ]; then
   export PATH="$CONTAINER_BIN_PATH:$PATH"
 fi
+
+# ZFS management aliases (machine-specific, not in dotfiles)
+source /git/RembrandtK/rem/config/machine/pms/zfs/root/zfs/bash-aliases.sh
+
+# Created by `pipx` on 2025-12-23 16:24:34
+export PATH="$PATH:/home/rem/.local/bin"
